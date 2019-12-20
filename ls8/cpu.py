@@ -12,7 +12,7 @@ class CPU:
         # self.ram =[[0] * 8] * 256 #256 bytes of ram
         self.SP = 7
         self.ram = [0] * 256
-        self.FL = 0
+        self.FL = 0b11111111
 
     def load(self):
         """Load a program into memory."""
@@ -59,13 +59,15 @@ class CPU:
         elif op == "MUL":
             return reg_a * reg_b
         elif op == "CMP":
-            print(f"A {reg_a}, B {reg_b}, Flag {self.FL}")
+            # print(f"A {reg_a}, B {reg_b}, Flag {self.FL}")
             if reg_a is reg_b:
-                self.FL = (self.FL & 0b00000001)
+                self.FL = 0b00000001
+                # print(f"flag now {self.FL}")
             elif reg_a > reg_b:
-                self.FL = (self.FL & 0b00000010)
+                self.FL = 0b00000010
             elif reg_a < reg_b:
-                self.FL = (self.FL & 0b00000100)
+                self.FL = 0b00000100
+                # print(f"less {self.FL}")
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -132,7 +134,7 @@ class CPU:
             # print("Current instruction", instruction_register)
             # print("in", instruction_register)
             if instruction_register == LDI:
-                print("store", operand_a, operand_b)
+                # print("store", operand_a, operand_b)
                 self.registers[operand_a] = operand_b
                 self.pc += 3
                 # self.pc += incr
@@ -151,21 +153,25 @@ class CPU:
                 # self.pc += 3
                 self.pc += 3
             elif instruction_register == JEQ:
-                # print("equal")
+                # print("equal", self.registers[operand_a], self.FL)
                 if self.FL == (self.FL & 0b00000001):
-                    self.jump(self.registers[operand_a])
-                # self.pc += 2
+                    # print("true", self.FL)
+                    self.pc = self.registers[operand_a]
+                else:
+                    self.pc += 2
             elif instruction_register == JNE:
-                print("JNE")
-                if self.FL == (self.FL & 0b11111111):
-                    print("True", self.FL, self.registers[operand_a])
-                    self.jump(self.registers[operand_a])
-                # self.pc += 2
+                # print("JNE", self.FL, self.registers[operand_a])
+                if self.FL != 0b00000001:
+                    # print("true")
+                    # print("True", self.FL, self.registers[operand_a])
+                    self.pc = self.registers[operand_a]
+                else:
+                    self.pc += 2
             elif instruction_register == JMP:
                 self.jump(self.registers[operand_a])
                 # self.pc += 2
             elif instruction_register == CMP:
-                print("CMP")
+                # print("CMP")
                 self.alu("CMP",self.registers[operand_a], self.registers[operand_b])
                 # print(self.FL)
                 self.pc += 3
