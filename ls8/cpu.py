@@ -35,7 +35,7 @@ class CPU:
         return self.ram[MAR]
 
     def ram_write(self, MAR, MAD):
-        pass
+        self.ram[MAR] = MAD
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
@@ -68,4 +68,6 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        pass
+        instruction = self.ram_read(self.pc)
+
+        
