@@ -28,6 +28,15 @@ class CPU:
             0b00000001, # HLT
         ]
 
+        # with open(sys.argv[1]) as f:
+        #     for line in f:
+        #         comment_split = line.strip().split("#")
+        #         num = comment_split[0]
+        #         if num == "":
+        #             continue
+        #         x = int(num, 2)
+        #         print(f"{x:08b}: {x:d}")
+        #         program.append(x)
         for instruction in program:
             self.ram[address] = instruction
             address += 1
@@ -69,19 +78,23 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        instruction = self.ram_read(self.pc)
         running = True
 
         LDI = 0b10000010
         PRN = 0b01000111
+        HALT = 0b00000001
         while running:
+            instruction = self.ram_read(self.pc)
+            operand_a = self.ram[self.pc + 1]
+            operand_b = self.ram[self.pc + 2]
             if instruction == LDI:
                 print("LDI")
-                self.registers[self.pc + 1] = self.ram[self.pc + 2]
+                self.registers[operand_a] = operand_b
                 self.pc += 3
             elif instruction == PRN:
-                print(self.registers[self.pc + 1])
+                print(self.registers[operand_a])
                 self.pc += 1
             elif instruction == HALT:
                 running = False
+                sys.exit()
         
