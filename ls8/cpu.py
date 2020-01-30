@@ -85,12 +85,14 @@ class CPU:
         """Run the CPU."""
         running = True
         
+        CALL = 0b01010000
         LDI = 0b10000010
         PRN = 0b01000111
         HALT = 0b00000001
         MUL = 0b10100010
         PUSH = 0b01000101
         POP = 0b01000110
+        RET = 0b01010000
 
         while running:
             instruction = self.ram_read(self.pc)
@@ -119,6 +121,9 @@ class CPU:
                 # print(f"value: {value}, reg {self.reg[operand_a]}")
                 self.sp += 1
                 self.pc += 2
+            elif instruction == CALL:
+                self.ram[self.sp] = self.ram[self.pc + 2]
+                self.pc = operand_b
             elif instruction == HALT:
                 running = False
             else:
