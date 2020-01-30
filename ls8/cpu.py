@@ -19,30 +19,30 @@ class CPU:
 
         # For now, we've just hardcoded a program:
 
-        program = [
-            # From print8.ls8
-            0b10000010, # LDI R0,8
-            0b00000000,
-            0b00001000,
-            0b01000111, # PRN R0
-            0b00000000,
-            0b00000001, # HLT
-        ]
+        # program = [
+        #     # From print8.ls8
+        #     0b10000010, # LDI R0,8
+        #     0b00000000,
+        #     0b00001000,
+        #     0b01000111, # PRN R0
+        #     0b00000000,
+        #     0b00000001, # HLT
+        # ]
 
-        # with open(sys.argv[1]) as f:
-        #     for line in f:
-        #         comment_split = line.strip().split("#")
-        #         num = comment_split[0]
-        #         if num == "":
-        #             continue
-        #         x = int(num, 2)
-        #         print(f"{x:08b}: {x:d}")
-        #         self.ram[address] = x
-        #         address += 1
+        with open(sys.argv[1]) as f:
+            for line in f:
+                comment_split = line.strip().split("#")
+                num = comment_split[0]
+                if num == "":
+                    continue
+                x = int(num, 2)
+                # print(f"{x:08b}: {x:d}")
+                self.ram[address] = x
+                address += 1
 
-        for instruction in program:
-            self.ram[address] = instruction
-            address += 1
+        # for instruction in program:
+        #     self.ram[address] = instruction
+        #     address += 1
 
     def ram_read(self, MAR):
         return self.ram[MAR]
@@ -84,7 +84,7 @@ class CPU:
     def run(self):
         """Run the CPU."""
         running = True
-
+        
         LDI = 0b10000010
         PRN = 0b01000111
         HALT = 0b00000001
@@ -103,23 +103,23 @@ class CPU:
                 self.pc += 3
             elif instruction == PRN:
                 print(self.reg[operand_a])
-                self.pc += 1
+                self.pc += 2
             elif instruction == MUL:
                 self.alu("MUL", operand_a, operand_b)
                 self.pc += 3
             elif instruction == PUSH:
-                value = self.reg[self.sp]
-                self.reg[self.sp] -= 1
-                self.ram[self.reg[self.sp]] = value
+                self.sp -= 1
+                value = self.reg[operand_a]
+                self.ram_write(self.sp, value)
+                # print(f"value: {value}, ram {self.ram[self.sp]}")
                 self.pc += 2
             elif instruction == POP:
-                reg = self.ram[self.pc + 1]
-                value = self.ram[self.reg[self.sp]]
-                self.reg[reg]
+                value = self.ram_read(self.sp)
+                self.reg[operand_a] = value
+                # print(f"value: {value}, reg {self.reg[operand_a]}")
+                self.sp += 1
+                self.pc += 2
             elif instruction == HALT:
-                print("test")
                 running = False
-                # break
-                sys.exit()
             else:
                 print("else")
