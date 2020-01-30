@@ -9,7 +9,8 @@ class CPU:
         """Construct a new CPU."""
         self.pc = 0
         self.ram = [0] * 255
-        self.registers = [0] * 7
+        self.reg = [0] * 8
+        self.sp = 7
 
     def load(self):
         """Load a program into memory."""
@@ -36,7 +37,9 @@ class CPU:
         #             continue
         #         x = int(num, 2)
         #         print(f"{x:08b}: {x:d}")
-        #         program.append(x)
+        #         self.ram[address] = x
+        #         address += 1
+
         for instruction in program:
             self.ram[address] = instruction
             address += 1
@@ -53,6 +56,8 @@ class CPU:
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
         #elif op == "SUB": etc
+        elif op == "MUL":
+            self.reg[reg_a] *= self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -83,18 +88,38 @@ class CPU:
         LDI = 0b10000010
         PRN = 0b01000111
         HALT = 0b00000001
+        MUL = 0b10100010
+        PUSH = 0b01000101
+        POP = 0b01000110
+
         while running:
             instruction = self.ram_read(self.pc)
-            operand_a = self.ram[self.pc + 1]
-            operand_b = self.ram[self.pc + 2]
+            operand_a = self.ram_read(self.pc + 1)
+            operand_b = self.ram_read(self.pc + 2)
+            # print(instruction >> 6)
             if instruction == LDI:
                 print("LDI")
-                self.registers[operand_a] = operand_b
+                self.reg[operand_a] = operand_b
                 self.pc += 3
             elif instruction == PRN:
-                print(self.registers[operand_a])
+                print(self.reg[operand_a])
                 self.pc += 1
+            elif instruction == MUL:
+                self.alu("MUL", operand_a, operand_b)
+                self.pc += 3
+            elif instruction == PUSH:
+                value = self.reg[self.sp]
+                self.reg[self.sp] -= 1
+                self.ram[self.reg[self.sp]] = value
+                self.pc += 2
+            elif instruction == POP:
+                reg = self.ram[self.pc + 1]
+                value = self.ram[self.reg[self.sp]]
+                self.reg[reg]
             elif instruction == HALT:
+                print("test")
                 running = False
+                # break
                 sys.exit()
-        
+            else:
+                print("else")
