@@ -99,6 +99,7 @@ class CPU:
         CALL = 0b01010000
         CMP = 0b10100111
         LDI = 0b10000010
+        JEQ = 0b01010101
         JMP = 0b01010100
         PRN = 0b01000111
         HALT = 0b00000001
@@ -126,6 +127,8 @@ class CPU:
             elif instruction == CMP:
                 self.alu("CMP", operand_a, operand_b)
                 self.pc += 2
+            elif instruction == JEQ:
+                
             elif instruction == JMP:
                 self.pc = self.reg[operand_a]
             elif instruction == MUL:
