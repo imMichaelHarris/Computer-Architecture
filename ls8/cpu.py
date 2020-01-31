@@ -11,7 +11,7 @@ class CPU:
         self.ram = [0] * 255
         self.reg = [0] * 8
         self.sp = 7
-        self.flag = 0b00000000
+        self.flag = 0b11111111
 
     def load(self):
         """Load a program into memory."""
@@ -129,15 +129,15 @@ class CPU:
                 self.alu("CMP", operand_a, operand_b)
                 self.pc += 2
             elif instruction == JEQ:
-                if self.flag is 0b00000001:
-                    self.pc = operand_a
+                if self.FL == (self.FL & 0b00000001):
+                    self.pc = self.reg[operand_a]
                 else:
                     self.pc += 2
             elif instruction == JNE:
-                if self.flag != 0b0000001:
-                    self.pc = operand_a
+                if self.FL != 0b00000001:
+                    self.pc = self.reg[operand_a]
                 else:
-                    self.pc += 2 
+                    self.pc += 2
             elif instruction == JMP:
                 self.pc = self.reg[operand_a]
             elif instruction == MUL:
