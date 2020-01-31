@@ -11,6 +11,7 @@ class CPU:
         self.ram = [0] * 255
         self.reg = [0] * 8
         self.sp = 7
+        self.flag = 0b00000000
 
     def load(self):
         """Load a program into memory."""
@@ -58,6 +59,15 @@ class CPU:
         #elif op == "SUB": etc
         elif op == "MUL":
             self.reg[reg_a] *= self.reg[reg_b]
+        elif op == "CMP":
+            if reg_a is reg_b:
+                self.flag = 0b00000001
+            elif reg < reg_b:
+                self.flag = 0b00000100
+            elif reg_a > reg_b:
+                self.flag = 0b00000010
+            else:
+                self.flag = 0b00000000
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -87,7 +97,9 @@ class CPU:
         
         ADD = 0b10101000
         CALL = 0b01010000
+        CMP = 0b10100111
         LDI = 0b10000010
+        JMP = 0b01010100
         PRN = 0b01000111
         HALT = 0b00000001
         MUL = 0b10100010
@@ -111,6 +123,11 @@ class CPU:
                 print("ADD")
                 self.alu("ADD", operand_a, operand_b)
                 self.pc += 2
+            elif instruction == CMP:
+                self.alu("CMP", operand_a, operand_b)
+                self.pc += 2
+            elif instruction == JMP:
+                self.pc = self.reg[operand_a]
             elif instruction == MUL:
                 print("Mul")
                 self.alu("MUL", operand_a, operand_b)
