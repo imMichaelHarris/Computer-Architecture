@@ -62,7 +62,7 @@ class CPU:
         elif op == "CMP":
             if reg_a is reg_b:
                 self.flag = 0b00000001
-            elif reg < reg_b:
+            elif reg_a < reg_b:
                 self.flag = 0b00000100
             elif reg_a > reg_b:
                 self.flag = 0b00000010
@@ -134,7 +134,10 @@ class CPU:
                 else:
                     self.pc += 2
             elif instruction == JNE:
-                if self.flag is 
+                if self.flag != 0b0000001:
+                    self.pc = operand_a
+                else:
+                    self.pc += 2 
             elif instruction == JMP:
                 self.pc = self.reg[operand_a]
             elif instruction == MUL:
