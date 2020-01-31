@@ -127,14 +127,14 @@ class CPU:
                 self.pc += 2
             elif instruction == CMP:
                 self.alu("CMP", operand_a, operand_b)
-                self.pc += 2
+                self.pc += 3
             elif instruction == JEQ:
-                if self.FL == (self.FL & 0b00000001):
+                if self.flag == (self.flag & 0b00000001):
                     self.pc = self.reg[operand_a]
                 else:
                     self.pc += 2
             elif instruction == JNE:
-                if self.FL != 0b00000001:
+                if self.flag != 0b00000001:
                     self.pc = self.reg[operand_a]
                 else:
                     self.pc += 2
