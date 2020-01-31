@@ -85,6 +85,7 @@ class CPU:
         """Run the CPU."""
         running = True
         
+        ADD = 0b10101000
         CALL = 0b01010000
         LDI = 0b10000010
         PRN = 0b01000111
@@ -100,13 +101,18 @@ class CPU:
             operand_b = self.ram_read(self.pc + 2)
             # print(instruction >> 6)
             if instruction == LDI:
-                print("LDI")
+                print(f"LDI {operand_a}, {operand_b}")
                 self.reg[operand_a] = operand_b
                 self.pc += 3
             elif instruction == PRN:
                 print(self.reg[operand_a])
                 self.pc += 2
+            elif instruction == ADD:
+                print("ADD")
+                self.alu("ADD", operand_a, operand_b)
+                self.pc += 2
             elif instruction == MUL:
+                print("Mul")
                 self.alu("MUL", operand_a, operand_b)
                 self.pc += 3
             elif instruction == PUSH:
@@ -122,8 +128,13 @@ class CPU:
                 self.sp += 1
                 self.pc += 2
             elif instruction == CALL:
-                self.ram[self.sp] = self.ram[self.pc + 2]
-                self.pc = operand_b
+                print("Call", operand_b, self.pc, self.pc + 2)
+                self.ram[self.sp] = self.pc + 2
+                print(f"Change {self.ram[self.sp]}")
+                self.pc = operand_a
+            elif instruction == RET:
+                print("RET")
+                self.pc = self.ram[self.sp]
             elif instruction == HALT:
                 running = False
             else:
